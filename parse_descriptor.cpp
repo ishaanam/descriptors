@@ -1,4 +1,6 @@
 #include <stdexcept>
+// REMOVE
+#include <iostream>
 
 #include "tokenizer.h"
 #include "descriptor.h"
@@ -11,7 +13,7 @@
 ScriptType string_to_script_type(const std::string& script_string)
 {
     auto it = script_types.find(script_string);
-    if (it == script_types.end()) return ScriptType::UNKNOWN_SCRIPT;
+    if (it == script_types.end()) throw std::runtime_error("unrecognized function '" + script_string + "'");
     return it->second;
 }
 
@@ -23,21 +25,29 @@ void parse_function(const ScriptType& func_type, const std::vector<Token>& token
         case ScriptType::SORTEDMULTI: 
         case ScriptType::SH:
         case ScriptType::WSH: {
-            throw std::runtime_error("This parser doesn't currently support some of the script expressions included in this descriptor");
+            throw std::runtime_error("This parser doesn't currently support '" + tokens[function_index].raw_token + "' type script expressions");
         }
         case ScriptType::PK:
         case ScriptType::PKH:
         case ScriptType::WPKH: {
-            // assert that the next token is a KEY
+            // the next token must be a key expression
+            const Token& current_token = tokens[function_index];
             const Token& next_token = tokens[function_index + 1];
-            assert (next_token.type == TokenType::KEY);
+            if (next_token.type != TokenType::KEY) throw std::runtime_error("The argument for a " + current_token.raw_token + "() function must be a key expression");
             // set the key now
             KeyExpression key_expr;
             key_expr.parse_raw_key_expr(next_token.raw_token);
             key_expr.set_key_type();
+            if (key_expr.get_key_type() == KeyType::UNKNOWN_KEY) throw std::runtime_error("Key '" + key_expr.get_raw_key() + "' has unknown type");
             script_expr.script_args.push_back(static_cast<ScriptArg>(key_expr));
-            // assert that the next thing is an END_FUNC token
-            assert (tokens[function_index + 2].type == TokenType::END_FUNC);
+            // ensure that the next token is an END_FUNC
+            if (tokens[function_index + 2].type != TokenType::END_FUNC) {
+                if (tokens[function_index + 2].type == TokenType::KEY || tokens[function_index + 2].type == TokenType::FUNCTION) {
+                    throw std::runtime_error("The script " + current_token.raw_token + "() function can only have a single key expression");
+                } else {
+                    throw std::runtime_error("Missing a parentheses after '" + current_token.raw_token + "(" + next_token.raw_token + "'");
+                }
+            }
             break;
         }
         default:
@@ -66,12 +76,16 @@ Descriptor tokens_to_descriptor(const std::vector<Token>& tokens)
             }
             case (TokenType::CHECKSUM): {
                 descriptor.checksum = token.raw_token;
-                // assert that this is the last token
-                assert (tokens[i+1].raw_token == "");
+                // this must be the last token
+                if (tokens[i+1].raw_token != "") throw std::runtime_error("The checksum '" + token.raw_token + "' can't be followed by another expression");
                 break;
             }
             case (TokenType::KEY):
-            case (TokenType::END_FUNC):
+                break;
+            case (TokenType::END_FUNC): {
+                const Token& next_token = tokens[i+1];
+                if (next_token.type != TokenType::END_FUNC && next_token.raw_token != "") throw std::runtime_error("A script expression can't be followed by '" + next_token.raw_token + "'");
+            }
             default:
                 break;
         }

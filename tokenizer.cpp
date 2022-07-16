@@ -21,7 +21,7 @@ std::vector<Token> Tokenizer(std::stringstream& ss)
                 break;
             }
             case '(':{
-                current_token.type = TokenType::FUNCTION;
+                if (current_token.type == TokenType::KEY) current_token.type = TokenType::FUNCTION;
                 tokens.push_back(current_token);
                 current_token.reset();
                 break;

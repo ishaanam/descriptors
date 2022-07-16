@@ -19,12 +19,10 @@ KeyType find_key_type(const std::string& key)
     switch(key_len)
     {
         case UNCOMPRESSED_PUBKEY_LEN: {
-            assert (key[1] == '4');
-            return KeyType::UNCOMPRESSED_PUBLIC_KEY;
+            if (key[1] == '4') return KeyType::UNCOMPRESSED_PUBLIC_KEY;
         }
         case COMPRESSED_PUBKEY_LEN: {
-            assert (key[1] == '2' || key[1] == '3');
-            return KeyType::COMPRESSED_PUBLIC_KEY;
+            if (key[1] == '2' || key[1] == '3') return KeyType::COMPRESSED_PUBLIC_KEY;
         }
         default: {
             if (key.substr(0,4) == "xpub") {
