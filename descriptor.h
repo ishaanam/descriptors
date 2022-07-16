@@ -52,4 +52,6 @@ struct Descriptor
     ScriptExpression script_expr;
 };
 
+void print_descriptor_info(const Descriptor& descriptor);
+
 #endif

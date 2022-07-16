@@ -9,8 +9,8 @@
 /*
     Contains the user interface. A descriptor can be provided to the program by 
     providing the path to a text file  or  entering the descriptor directly.
-    
 */
+
 std::stringstream input_to_ss(const std::string raw_user_input)
 {
     std::string raw_descriptor;
@@ -32,8 +32,7 @@ int main()
         std::string raw_user_input;
         std::cin>>raw_user_input;
         const Descriptor descriptor = ss_to_descriptor(input_to_ss(raw_user_input));
-        std::cout << descriptor.script_expr.script_function << '\n';
-        // doesn't actually do anything useful with the descriptor yet
+		print_descriptor_info(descriptor);
     } catch (std::runtime_error& error) {
         std::cerr << error.what() << '\n';
     } catch (...) {
