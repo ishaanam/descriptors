@@ -31,7 +31,7 @@ int main()
         std::cout << "Please enter a descriptor directly or enter the path to a file containing a descriptor: "; 
         std::string raw_user_input;
         std::cin>>raw_user_input;
-        const Descriptor descriptor = ss_to_descriptor(input_to_ss(raw_user_input));
+        Descriptor descriptor = ss_to_descriptor(input_to_ss(raw_user_input));
 		print_descriptor_info(descriptor);
     } catch (std::runtime_error& error) {
         std::cerr << error.what() << '\n';

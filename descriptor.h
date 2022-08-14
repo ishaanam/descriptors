@@ -43,6 +43,7 @@ typedef std::variant<ScriptExpression, KeyExpression>  ScriptArg;
 struct ScriptExpression
 {
     ScriptType script_function;
+    std::string raw_script_function;
     std::vector<ScriptArg> script_args;
 };
 
@@ -52,6 +53,6 @@ struct Descriptor
     ScriptExpression script_expr;
 };
 
-void print_descriptor_info(const Descriptor& descriptor);
+void print_descriptor_info(Descriptor& descriptor);
 
 #endif

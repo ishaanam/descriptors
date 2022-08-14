@@ -1,6 +1,4 @@
 #include <stdexcept>
-// REMOVE
-#include <iostream>
 
 #include "tokenizer.h"
 #include "descriptor.h"
@@ -66,6 +64,7 @@ Descriptor tokens_to_descriptor(const std::vector<Token>& tokens)
         switch (token.type)
         {
             case (TokenType::FUNCTION): {
+                script_expr.raw_script_function = token.raw_token;
                 script_expr.script_function =  string_to_script_type(token.raw_token);
                 parse_function(script_expr.script_function, tokens, script_expr, i);
                 if (std::holds_alternative<ScriptExpression>(script_expr.script_args[0]))
