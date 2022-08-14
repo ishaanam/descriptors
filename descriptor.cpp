@@ -36,27 +36,28 @@ std::string get_desc_address_type_string(const Descriptor& descriptor)
 std::string get_descriptor_tree(Descriptor& descriptor)
 {
     std::string desc_tree{""};
-    int function_count{1}; // Every descriptor has at least one script expression
+    int function_count{0};
     ScriptExpression* ptr_script_expr = &descriptor.script_expr;
-
-    desc_tree += descriptor.script_expr.raw_script_function;
 
     while (ptr_script_expr)
     {
-        desc_tree += ptr_script_expr->script_function; // convert to string later
-        desc_tree += "\n\t";
+        desc_tree += '\n';
+        for (int i = 0; i < function_count; i++) desc_tree += '\t';
+        desc_tree += ptr_script_expr->raw_script_function;
+        function_count++;
         for (ScriptArg& script_arg : ptr_script_expr->script_args)
         {
             if (std::holds_alternative<ScriptExpression>(script_arg)) // maybe replace w/ get_if() or something later ?
             {
                 assert (ptr_script_expr->script_args.size() == 1);
-                function_count++;
                 ScriptExpression& script_expr = std::get<ScriptExpression>(script_arg);
                 ptr_script_expr = &script_expr;
             }
             else if (std::holds_alternative<KeyExpression>(script_arg))
             {
                 KeyExpression& key_expr = std::get<KeyExpression>(script_arg);
+                desc_tree += '\n';
+                for (int i = 0; i <= function_count; i++) desc_tree += '\t';
                 switch (key_expr.get_key_type())
                 {
                     case KeyType::COMPRESSED_PUBLIC_KEY:
@@ -88,6 +89,7 @@ std::string get_descriptor_tree(Descriptor& descriptor)
             }
         }
     }
+    std::cout << "function count: " << function_count << '\n';
     return desc_tree;
 }
 
