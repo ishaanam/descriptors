@@ -89,19 +89,54 @@ std::string get_descriptor_tree(Descriptor& descriptor)
             }
         }
     }
-    std::cout << "function count: " << function_count << '\n';
     return desc_tree;
+}
+
+bool is_solvable(Descriptor& descriptor)
+{
+    ScriptExpression* ptr_script_expr = &descriptor.script_expr;
+    bool solvable = true;
+
+    while (ptr_script_expr)
+    {
+        int threshold = 1;
+        int reached_threshold = 0;
+        bool key_expr = false;
+        for (ScriptArg& script_arg : ptr_script_expr->script_args)
+        {
+            if (std::holds_alternative<ScriptExpression>(script_arg))
+            {
+                assert (ptr_script_expr->script_args.size() == 1);
+                ScriptExpression& script_expr = std::get<ScriptExpression>(script_arg);
+                ptr_script_expr = &script_expr;
+            }
+            else if (std::holds_alternative<KeyExpression>(script_arg))
+            {
+                key_expr = true;
+                KeyExpression& key_expr = std::get<KeyExpression>(script_arg);
+                if (key_expr.get_key_type() == KeyType::NUM) threshold = std::stoi(key_expr.get_raw_key());
+                if (key_expr.is_private()) reached_threshold++;
+                ptr_script_expr = nullptr;
+            }
+        }
+        if (key_expr)
+        {
+            bool internal_solvable = reached_threshold >= threshold;
+            solvable &= internal_solvable;
+        }
+    }
+    return solvable;
 }
 
 void print_descriptor_info(Descriptor& descriptor)
 {
-    // eventuallly print:
+    // eventually print:
     // checksum (if there is no checksum included, compute one)
-    // script type (so the standard ones like p2wsh, p2sh-p2wpkh, etc.)
-    // are these scripts spendable using just this descriptor?
     // what an example script will look like
+
     std::cout << get_desc_address_type_string(descriptor);
-    std::cout << get_descriptor_tree(descriptor) << '\n';
+    std::cout << "solvable: " << (is_solvable(descriptor) ? "true" : "false") << '\n';
+    std::cout <<get_descriptor_tree(descriptor) << '\n';
 }
 
 void KeyExpression::parse_raw_key_expr(const std::string raw_key_expr)
