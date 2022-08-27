@@ -5,6 +5,8 @@
 #include <vector>
 #include <optional>
 #include <sstream>
+#include <cassert>
+#include <variant>
 
 #include "sort_keys.h"
 #include "types.h"
