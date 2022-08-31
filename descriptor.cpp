@@ -2,6 +2,7 @@
 #include <string>
 
 #include "descriptor.h"
+#include "script_functions.h"
 
 /*
     A bunch of functions related to getting information from output descriptors.
@@ -127,11 +128,11 @@ void print_descriptor_info(Descriptor& descriptor)
 {
     // eventually print:
     // checksum (if there is no checksum included, compute one)
-    // what an example script will look like
 
     std::cout << get_desc_address_type_string(descriptor);
     std::cout << "solvable: " << (is_solvable(descriptor) ? "true" : "false") << '\n';
-    std::cout <<get_descriptor_tree(descriptor) << '\n';
+    std::cout << get_descriptor_tree(descriptor) << '\n';
+    std::cout << '\n' << get_script_string(descriptor.script_expr) << '\n';
 }
 
 void KeyExpression::parse_raw_key_expr(const std::string raw_key_expr)
