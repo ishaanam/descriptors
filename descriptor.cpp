@@ -47,18 +47,14 @@ std::string get_descriptor_tree(Descriptor& descriptor)
         function_count++;
         for (ScriptArg& script_arg : ptr_script_expr->script_args)
         {
-            if (std::holds_alternative<ScriptExpression>(script_arg)) // maybe replace w/ get_if() or something later ?
-            {
-                assert (ptr_script_expr->script_args.size() == 1);
-                ScriptExpression& script_expr = std::get<ScriptExpression>(script_arg);
-                ptr_script_expr = &script_expr;
-            }
-            else if (std::holds_alternative<KeyExpression>(script_arg))
-            {
-                KeyExpression& key_expr = std::get<KeyExpression>(script_arg);
+            const bool correct_size = ptr_script_expr->script_args.size() == 1;
+            ptr_script_expr = std::get_if<ScriptExpression>(&script_arg);
+            if (ptr_script_expr) {
+                assert (correct_size);
+            } else if (KeyExpression* ptr_key_expr = std::get_if<KeyExpression>(&script_arg)) {
                 desc_tree += '\n';
                 for (int i = 0; i <= function_count; i++) desc_tree += '\t';
-                switch (key_expr.get_key_type())
+                switch (ptr_key_expr->get_key_type())
                 {
                     case KeyType::COMPRESSED_PUBLIC_KEY:
                     case KeyType::UNCOMPRESSED_PUBLIC_KEY: {
@@ -84,8 +80,7 @@ std::string get_descriptor_tree(Descriptor& descriptor)
                     default:
                         break;
                 }
-                desc_tree += key_expr.get_raw_key();
-                ptr_script_expr = nullptr;
+                desc_tree += ptr_key_expr->get_raw_key();
             }
         }
     }
