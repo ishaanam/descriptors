@@ -1,5 +1,5 @@
 # Output Script Descriptor Parser
-This parser currently only supports the pk(), pkh(), wpkh(), sh(), wsh(), and multi() script expressions. This parser doesn't really do anything useful with the descriptor after it parses it, I mainly made it to learn about descriptors.
+This parser currently only supports the pk(), pkh(), wpkh(), sh(), wsh(), and multi() script expressions. This parser doesn't really do anything useful with the descriptor after it parses it, I mainly made it to learn about descriptors and to potentially build off of it in the future.
 
 ### Reference BIPs
 + [BIP 380: Output Script Descriptors General Operation](https://github.com/bitcoin/bips/blob/master/bip-0380.mediawiki)
